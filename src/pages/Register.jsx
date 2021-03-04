@@ -67,7 +67,6 @@ const RegistrationPage = () => {
                 type='email'
                 name='email'
                 id='email'
-                placeholder='user@exmaple.com'
                 onChange={setSetter(setEmail)}
               />
             </FormGroup>
@@ -81,7 +80,6 @@ const RegistrationPage = () => {
                 type='password'
                 name='password'
                 id='password'
-                placeholder='password placeholder'
                 onChange={setSetter(setPassword)}
               />
             </FormGroup>
@@ -95,7 +93,6 @@ const RegistrationPage = () => {
                 type='password'
                 name='passwordConfirm'
                 id='passwordConfirm'
-                placeholder='password placeholder'
                 onChange={setSetter(setPasswordConfirm)}
               />
             </FormGroup>

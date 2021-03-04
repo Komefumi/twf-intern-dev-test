@@ -60,7 +60,6 @@ const LoginPage = () => {
                 type='email'
                 name='email'
                 id='email'
-                placeholder='user@exmaple.com'
                 onChange={setSetter(setEmail)}
               />
             </FormGroup>
@@ -74,7 +73,6 @@ const LoginPage = () => {
                 type='password'
                 name='password'
                 id='password'
-                placeholder='password placeholder'
                 onChange={setSetter(setPassword)}
               />
             </FormGroup>
