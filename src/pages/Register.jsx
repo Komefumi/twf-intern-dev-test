@@ -1,17 +1,20 @@
 import { useState, useEffect } from 'react';
 import { Col, Row, Button, Form, FormGroup, Label, Input } from 'reactstrap';
-import { NavLink } from 'react-router-dom';
-import { ROUTE_HOME } from '../constants';
+import { NavLink, useHistory } from 'react-router-dom';
+import firebase from 'firebase';
 
-const RegistrationPage = (props) => {
+import { ROUTE_HOME, ROUTE_PROFILE } from '../constants';
+
+import { setSetter, useAuthContext } from '../utils';
+
+const RegistrationPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [isValid, setIsValid] = useState(false);
+  const history = useHistory();
 
-  const useSetter = (setter) => (e) => {
-    setter(e.target.value);
-  };
+  const Auth = useAuthContext();
 
   useEffect(() => {
     let invalid = [email, password].some((current) => {
@@ -25,9 +28,37 @@ const RegistrationPage = (props) => {
     }
   }, [email, password, passwordConfirm]);
 
+  const onSubmit = (e) => {
+    e.preventDefault();
+    firebase
+      .auth()
+      .setPersistence(firebase.auth.Auth.Persistence.SESSION)
+      .then(() => {
+        firebase
+          .auth()
+          .createUserWithEmailAndPassword(email, password)
+          .then((res) => {
+            console.log({ res });
+            if (res.user) {
+              Auth.setUserEmail(res.user.email);
+              Auth.setIsLoggedIn(true);
+              // history.push(ROUTE_PROFILE);
+            }
+          })
+          .catch((e) => {
+            console.error({ e });
+          });
+      });
+  };
+
+  if (Auth.isLoggedIn) {
+    history.replace(ROUTE_PROFILE);
+    return;
+  }
+
   return (
     <main className='page-container'>
-      <Form>
+      <Form onSubmit={onSubmit}>
         <Row form>
           <Col xs={12}>
             <FormGroup>
@@ -37,7 +68,7 @@ const RegistrationPage = (props) => {
                 name='email'
                 id='email'
                 placeholder='user@exmaple.com'
-                onChange={useSetter(setEmail)}
+                onChange={setSetter(setEmail)}
               />
             </FormGroup>
           </Col>
@@ -51,7 +82,7 @@ const RegistrationPage = (props) => {
                 name='password'
                 id='password'
                 placeholder='password placeholder'
-                onChange={useSetter(setPassword)}
+                onChange={setSetter(setPassword)}
               />
             </FormGroup>
           </Col>
@@ -65,7 +96,7 @@ const RegistrationPage = (props) => {
                 name='passwordConfirm'
                 id='passwordConfirm'
                 placeholder='password placeholder'
-                onChange={useSetter(setPasswordConfirm)}
+                onChange={setSetter(setPasswordConfirm)}
               />
             </FormGroup>
           </Col>

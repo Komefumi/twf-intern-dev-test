@@ -1,11 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import firebase from 'firebase';
+
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+import firebaseConfig from './firebase.config';
+
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-datepicker/dist/react-datepicker.css';
+
+firebase.initializeApp(firebaseConfig);
 
 ReactDOM.render(
   <React.StrictMode>

@@ -31,3 +31,8 @@ code {
 .link-block {
   text-align: right;
 }
+
+.logout-button-section {
+  display: flex;
+  justify-content: flex-end;
+}

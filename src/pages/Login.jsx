@@ -1,16 +1,19 @@
 import { useState, useEffect } from 'react';
 import { Col, Row, Button, Form, FormGroup, Label, Input } from 'reactstrap';
-import { NavLink } from 'react-router-dom';
-import { ROUTE_SIGNUP } from '../constants';
+import { NavLink, useHistory } from 'react-router-dom';
+import firebase from 'firebase';
 
-const LoginPage = (props) => {
+import { ROUTE_SIGNUP, ROUTE_PROFILE } from '../constants';
+
+import { setSetter, useAuthContext } from '../utils';
+
+const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isValid, setIsValid] = useState(false);
+  const history = useHistory();
 
-  const useSetter = (setter) => (e) => {
-    setter(e.target.value);
-  };
+  const Auth = useAuthContext();
 
   useEffect(() => {
     let invalid = [email, password].some((current) => {
@@ -23,9 +26,32 @@ const LoginPage = (props) => {
     }
   }, [email, password]);
 
+  const onSubmit = (e) => {
+    e.preventDefault();
+    firebase
+      .auth()
+      .signInWithEmailAndPassword(email, password)
+      .then((res) => {
+        if (res.user) {
+          Auth.setUserEmail(res.user.email);
+          Auth.setIsLoggedIn(true);
+          // history.push(ROUTE_PROFILE);
+        }
+
+        return;
+      })
+      .catch((e) => {
+        console.error({ e });
+      });
+  };
+
+  if (Auth.isLoggedIn) {
+    history.replace(ROUTE_PROFILE);
+  }
+
   return (
     <main className='page-container'>
-      <Form>
+      <Form onSubmit={onSubmit}>
         <Row form>
           <Col xs={12}>
             <FormGroup>
@@ -35,7 +61,7 @@ const LoginPage = (props) => {
                 name='email'
                 id='email'
                 placeholder='user@exmaple.com'
-                onChange={useSetter(setEmail)}
+                onChange={setSetter(setEmail)}
               />
             </FormGroup>
           </Col>
@@ -49,13 +75,13 @@ const LoginPage = (props) => {
                 name='password'
                 id='password'
                 placeholder='password placeholder'
-                onChange={useSetter(setPassword)}
+                onChange={setSetter(setPassword)}
               />
             </FormGroup>
           </Col>
         </Row>
         <Row form>
-          <Button disabled={!isValid}>Sign Up</Button>
+          <Button disabled={!isValid}>Log In</Button>
         </Row>
       </Form>
       <div className='link-block'>

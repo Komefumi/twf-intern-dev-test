@@ -1,58 +1,106 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Form, FormGroup, Label, Input, Row, Col } from 'reactstrap';
+import React, { useState, useEffect, useRef } from 'react';
+import { Button, Form, FormGroup, Label, Row, Col } from 'reactstrap';
 import DatePicker from 'react-datepicker';
+import { useHistory } from 'react-router-dom';
+import firebase from 'firebase';
 
-const ProfilePage = (props) => {
-  const [email, setEmail] = useState('');
+import { ROUTE_HOME } from '../constants';
+import { useAuthContext } from '../utils';
+
+const ProfilePage = () => {
+  const isInitialMount = useRef(true);
+
+  const detailsRef = useRef(firebase.firestore().collection('details'));
   const [dob, setDob] = useState(new Date());
+  const [dobGained, setDobGained] = useState(false);
   const [isValid, setIsValid] = useState(false);
+  const history = useHistory();
 
-  const useSetter = (setter) => (e) => {
-    setter(e.target.value);
-  };
+  const Auth = useAuthContext();
 
   useEffect(() => {
-    let invalid = [email].some((current) => {
-      return current.length === 0;
-    });
-    if (invalid) {
-      setIsValid(false);
-    } else {
-      setIsValid(true);
+    // console.log(detailsRef.current);
+    detailsRef.current
+      .where('email', '==', Auth.userEmail)
+      .get()
+      .then((querySnapshot) => {
+        const data = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        console.log({ data });
+        if (data.length) {
+          setDob(new Date(data[0].dob));
+          setDobGained(true);
+        }
+      });
+  }, [Auth.userEmail]);
+
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
     }
-  }, [email, dob]);
+
+    if (dob) {
+      setIsValid(true);
+    } else {
+      setIsValid(false);
+    }
+  }, [dob]);
+
+  const logout = (e) => {
+    Auth.setUserEmail('');
+    Auth.setIsLoggedIn(false);
+    history.replace(ROUTE_HOME);
+  };
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+    detailsRef.current
+      .add({
+        email: Auth.userEmail,
+        dob: dob.toString(),
+      })
+      .then((res) => {
+        console.log('It worked?');
+        console.log({ res });
+        setDobGained(true);
+      })
+      .catch((e) => {
+        console.log('Well...');
+        console.error({ e });
+      });
+  };
+
+  if (!Auth.isLoggedIn) {
+    history.replace(ROUTE_HOME);
+    return;
+  }
 
   return (
     <main className='page-container'>
-      <Form>
+      <Form onSubmit={onSubmit}>
         <Row form>
           <Col xs={12}>
             <FormGroup>
-              <Label for='email'>Email</Label>
-              <Input
-                type='email'
-                name='email'
-                id='email'
-                placeholder='user@exmaple.com'
-                onChange={useSetter(setEmail)}
-              />
-            </FormGroup>
-          </Col>
-        </Row>
-        <Row form>
-          <Col xs={12}>
-            <FormGroup>
-              <Label for='dob'>Date of Birth</Label>
+              <Label for='dob'>Date of Birth</Label>&nbsp;
               <DatePicker
                 id='dob'
                 selected={dob}
                 onChange={(date) => setDob(date)}
+                disabled={dobGained}
               />
             </FormGroup>
           </Col>
         </Row>
-        <Row form>
-          <Button disabled={!isValid}>Sign Up</Button>
+        {!dobGained && (
+          <Row form>
+            <Button disabled={!isValid}>Save</Button>
+          </Row>
+        )}
+        <Row className='logout-button-section' form>
+          <Button onClick={logout}>Logout</Button>
         </Row>
       </Form>
     </main>
