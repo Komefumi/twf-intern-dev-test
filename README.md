@@ -7,3 +7,7 @@ With the lack of time owing to having managed to be considered for a few applica
 The code isn't completely DRY in principle, but I've tried to keep it fairly straightforward.
 
 The application interfaces with Google's Firebase API and makes use of it to provide registration and backend storage.
+
+The application may be considered a 'proof of concept'. A barebones, limited application.
+
+Live version: [Here](https://arjun-s-twf-intern-test.web.app/)
