@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Col, Row, Button, Form, FormGroup, Label, Input } from 'reactstrap';
+import { NavLink } from 'react-router-dom';
+import { ROUTE_HOME } from '../constants';
 
 const RegistrationPage = (props) => {
   const [email, setEmail] = useState('');
@@ -24,7 +26,7 @@ const RegistrationPage = (props) => {
   }, [email, password, passwordConfirm]);
 
   return (
-    <main className='registration-page-container'>
+    <main className='page-container'>
       <Form>
         <Row form>
           <Col xs={12}>
@@ -72,6 +74,9 @@ const RegistrationPage = (props) => {
           <Button disabled={!isValid}>Sign Up</Button>
         </Row>
       </Form>
+      <div className='link-block'>
+        <NavLink to={ROUTE_HOME}>Switch to Login</NavLink>
+      </div>
     </main>
   );
 };

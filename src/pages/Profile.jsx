@@ -23,7 +23,7 @@ const ProfilePage = (props) => {
   }, [email, dob]);
 
   return (
-    <main className='registration-page-container'>
+    <main className='page-container'>
       <Form>
         <Row form>
           <Col xs={12}>

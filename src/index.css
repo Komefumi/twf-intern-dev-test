@@ -22,8 +22,12 @@ code {
   min-height: 100vh;
 }
 
-.registration-page-container {
+.page-container {
   margin: 2em auto;
   padding: 1em;
   max-width: 1000px;
+}
+
+.link-block {
+  text-align: right;
 }
